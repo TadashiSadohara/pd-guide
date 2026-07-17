@@ -9,6 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
+<style>
+  @media (max-width: 600px) {
+    .screen-guide-list {
+      columns: 1;
+    }
+  }
+</style>
 </head>
 <body>
 
@@ -61,7 +68,7 @@
     </div>
     <div class="tab-card">
       <img src="assets/images/screen-overview.jpg" alt="PrivaDiary画面各部の説明（設定・LIFEタブ・友達タブ・日記帳の着せ替え・オフライン日記帳切り替えなどの位置）" style="width:100%;height:auto;border-radius:14px;display:block;">
-      <ul style="margin-top:22px;columns:2;column-gap:40px;">
+      <ul class="screen-guide-list" style="margin-top:22px;columns:2;column-gap:40px;">
         <li>ユーザー名：新規登録が完了すると表示されます</li>
         <li>設定：新規登録・友達招待・着せ替えなどはここから行います</li>
         <li>LIFEモード選択タブ：日記帳・アルバム・連絡先などをここで切り替えます</li>
