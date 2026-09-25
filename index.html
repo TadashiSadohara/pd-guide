@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PrivaDiary のご案内 | メモ＆メッセージアプリ</title>
-<meta name="description" content="PrivaDiaryは、日々の記録と大切な人とのやり取りをひとつにした個人向け多機能メモ＆メッセージアプリです。使い方をご案内します。">
+<meta name="description" content="PrivaDiaryは、日々の記録と大切な人とのやり取り、そして自分だけのWebページまでをひとつにした個人向け多機能アプリです。使い方をご案内します。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -15,6 +15,329 @@
       columns: 1;
     }
   }
+
+  /* =========================================================
+     ★ このページ専用の追加スタイル（assets/style.cssは変更していません）
+     ① 目次（TOC）まわり　② 画像未準備の代わりに出す「プレースホルダー」
+     ③ 実際に動くCSSアニメーションのデモ（本物のアプリと同じCSSを使用）
+     ========================================================= */
+
+  /* ---------- 目次カード（本文内・全幅） ---------- */
+  .toc-card{
+    background:#fff; border:1px solid var(--line); border-radius:18px;
+    padding:32px 36px 8px;
+  }
+  .toc-groups{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:28px 24px;
+  }
+  @media (max-width:860px){ .toc-groups{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:520px){ .toc-groups{ grid-template-columns:1fr; } }
+  .toc-group h4{
+    font-family:var(--serif); font-size:1rem; color:var(--plum-deep);
+    margin:0 0 10px; padding-bottom:8px; border-bottom:1px solid var(--line);
+  }
+  .toc-group ul{ list-style:none; margin:0 0 24px; padding:0; }
+  .toc-group li{ margin-bottom:8px; }
+  .toc-group a{
+    text-decoration:none; color:var(--muted); font-size:.9rem;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .toc-group a:hover{ color:var(--plum); }
+  .toc-group a::before{ content:"›"; color:var(--gold); font-weight:700; }
+
+  /* ---------- 「目次にもどる」フローティングボタン ---------- */
+  #toc-fab{
+    position:fixed; right:18px; bottom:18px; z-index:60;
+    display:flex; align-items:center; gap:8px;
+    background:var(--plum); color:#F3E9EE; text-decoration:none;
+    font-family:var(--serif); font-size:.85rem; letter-spacing:.04em;
+    padding:12px 18px; border-radius:999px;
+    box-shadow:0 10px 24px -10px rgba(53,21,47,.55);
+    opacity:0; pointer-events:none; transform:translateY(8px);
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  #toc-fab.show{ opacity:1; pointer-events:auto; transform:translateY(0); }
+  #toc-fab::before{ content:"☰"; font-size:.85rem; }
+
+  /* ---------- 画像プレースホルダー（実機スクリーンショット未準備の箇所） ---------- */
+  .shot-placeholder{
+    background:var(--paper-tint); border:1.5px dashed var(--gold-soft);
+    border-radius:14px; padding:34px 22px; text-align:center;
+    color:var(--muted); width:100%;
+  }
+  .shot-placeholder .ph-icon{ font-size:1.6rem; margin-bottom:10px; }
+  .shot-placeholder .ph-text{ font-size:.86rem; line-height:1.7; }
+  .shot-placeholder .ph-file{
+    display:inline-block; margin-top:8px; font-size:.76rem;
+    background:#fff; border:1px solid var(--line); border-radius:6px;
+    padding:3px 10px; color:var(--plum);
+  }
+  .mini-card .shot-placeholder{ padding:20px 14px; margin-top:16px; }
+  .mini-card .shot-placeholder .ph-icon{ font-size:1.15rem; margin-bottom:6px; }
+
+  /* ---------- 実画像への自動差し替え ----------
+     img.autoshotはassets/images/配下の指定ファイルを読み込もうとします。
+     ファイルが無ければ非表示のまま＝直後のプレースホルダーが見える。
+     ファイルを置いていただくと、読み込み成功時に自動でプレースホルダーが
+     消え、実画像に置き換わります（HTML側の編集は不要・ファイルを置くだけ）。 */
+  img.autoshot{ display:none; }
+  img.autoshot.ok{ display:block; }
+  img.autoshot.ok + .shot-placeholder{ display:none; }
+  .mini-card img.autoshot.ok + .shot-placeholder{ display:none; }
+
+  /* ---------- 動くアニメーションデモ枠 ---------- */
+  .live-demo{
+    background:var(--paper-tint); border-radius:16px; padding:26px 22px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px; width:100%;
+  }
+  .live-demo .live-demo-stage{
+    background:#fff; border-radius:12px; padding:24px 30px;
+    box-shadow:0 18px 40px -18px rgba(53,21,47,.35);
+    display:flex; align-items:center; justify-content:center; gap:36px;
+  }
+  .live-demo .live-demo-caption{
+    font-size:.78rem; color:var(--muted); text-align:center; line-height:1.7;
+  }
+  .live-demo .live-demo-caption b{ color:var(--plum); }
+
+  /* ===== 本物のアプリ(PrivaDiary_app)から抽出した、動くCSSアニメーション ==
+     v21.61時点のソースコードと完全に同じ定義です。static screenshotではなく、
+     このページ自体がブラウザ上で計算して描画しているので、実際のアプリと
+     同じ「ぐるっと回る」「くるくる回転して色が変わる」動きがそのまま
+     ご覧いただけます。 */
+
+  /* --- Eマップ▼（3D回転マーク） --- */
+  .demo-emap-grid{
+    position:relative; width:120px; height:110px; border-radius:10px;
+    overflow:hidden; background:linear-gradient(135deg,#eaf1fb,#dbe7f7);
+  }
+  .demo-emap-arrow-wrap {
+    position: absolute; left: 50%; top: 50%; width: 27px; height: 33px;
+    margin-left: -13.5px; margin-top: -27px;
+    perspective: 300px;
+  }
+  .demo-emap-arrow {
+    position: relative; width: 27px; height: 33px;
+    transform-style: preserve-3d;
+    transform-origin: 50% 100%;
+    animation: demoTopArrowSpin3D 6s linear infinite;
+  }
+  .demo-emap-arrow-front, .demo-emap-arrow-back {
+    position: absolute; top: 0; left: 0; width: 0; height: 0;
+    border-left: 13.5px solid transparent; border-right: 13.5px solid transparent;
+    border-top: 33px solid #1a3d7c;
+    backface-visibility: hidden;
+  }
+  .demo-emap-arrow-back {
+    border-top-color: #d9a83c;
+    transform: rotateY(180deg);
+  }
+  @keyframes demoTopArrowSpin3D {
+    0%   { transform: rotateX(20deg) rotateY(0deg); }
+    100% { transform: rotateX(20deg) rotateY(360deg); }
+  }
+
+  /* --- MyWeb・WebPDの地球儀を回る衛星（前面/奥をz-indexで切替） --- */
+  .demo-globe-wrap {
+    position: relative; display: inline-flex; align-items: center; justify-content: center;
+    width: 3.2rem; height: 3.2rem;
+  }
+  .demo-globe-emoji {
+    position: relative; z-index: 2; display: block;
+    font-size: 3.2rem; line-height: 1;
+  }
+  .demo-globe-orbit {
+    position: absolute; inset: -26px;
+    transform: scaleY(0.42);
+    animation: demoGlobeSatelliteZ 4.5s linear infinite;
+  }
+  .demo-globe-orbit-spin {
+    position: relative; width: 100%; height: 100%;
+    animation: demoGlobeOrbitSpin 4.5s linear infinite;
+  }
+  .demo-globe-wrap.demo-globe-reverse .demo-globe-orbit-spin {
+    animation-direction: reverse;
+  }
+  @keyframes demoGlobeOrbitSpin { to { transform: rotate(360deg); } }
+  .demo-globe-satellite {
+    position: absolute; top: 0; left: 50%; width: 21px; height: 21px; margin-left: -10.5px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ffd699, #f5941f 55%, #c2660a);
+    box-shadow: 0 0 3px rgba(0,0,0,0.35);
+  }
+  @keyframes demoGlobeSatelliteZ {
+    0%    { z-index: 1; }
+    24.9% { z-index: 1; }
+    25%   { z-index: 3; }
+    74.9% { z-index: 3; }
+    75%   { z-index: 1; }
+    100%  { z-index: 1; }
+  }
+  .demo-globe-label{ text-align:center; font-size:.78rem; color:var(--muted); margin-top:6px; }
+
+  /* =========================================================
+     ★ WEBモードのTOP画面まるごとプレビュー（#web-overview内）
+     実際のアプリ #yunomi-tab-top-content のCSSクラス名・構造をそのまま
+     再現（v21.61時点のソース準拠）。のれん画像・Eマップ背景画像は
+     未準備のため、本物のアプリと同じ考え方でプレースホルダーにして
+     あります（本物側コメントにも「画像を用意した段階で背景だけ差し替え、
+     クリック領域・アニメーションのロジックはそのまま使い回す」とあり、
+     この置き方と同じ方式です）。img.autoshotは指定ファイル名の画像を
+     assets/images/に置くだけで自動的に読み込まれ、プレースホルダーの
+     代わりに表示されます（HTML編集は不要）。ファイルが無い間は読み込みに
+     失敗して非表示のままになるので、プレースホルダーだけが見えます。 */
+  .webtop-row{
+    display:grid; grid-template-columns:1fr auto; gap:48px; align-items:start;
+  }
+  @media (max-width:860px){ .webtop-row{ grid-template-columns:1fr; justify-items:center; } }
+  .webtop-frame{
+    position:relative; width:260px; flex:none;
+    border-radius:34px; background:#1c1420; padding:14px 12px 18px;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04);
+  }
+  .webtop-frame::before{
+    content:""; position:absolute; top:22px; left:50%; transform:translateX(-50%);
+    width:46px; height:5px; border-radius:4px; background:rgba(255,255,255,.18);
+  }
+  .webtop-screen{
+    margin-top:18px; background:#f5f2ee; border-radius:20px;
+    padding:14px 10px 20px; text-align:center;
+  }
+  /* ---- ここから下は本物のアプリのCSSクラス名をそのまま使用 ---- */
+  .yunomi-top-lead{ font-size:.72rem; color:#7a7068; margin:16px 0 0; }
+  .yunomi-top-lead:first-child{ margin-top:2px; }
+  .yunomi-top-card{
+    cursor:pointer; border-radius:16px; padding:12px 10px; margin:8px auto 0;
+    max-width:420px; border:1px solid #e4dfd8; background:#ffffff;
+  }
+  #webtop-curtain{ border-radius:10px; overflow:hidden; }
+  .webtop-curtain-ph{
+    height:78px; border-radius:10px;
+    background:repeating-linear-gradient(90deg,#dff1e4,#dff1e4 22px,#cdeada 22px,#cdeada 44px);
+    display:flex; align-items:center; justify-content:center;
+    color:#3f6b4e; font-size:.68rem; font-weight:700; letter-spacing:.04em;
+  }
+  .yunomi-top-catchphrase{
+    font-family:Georgia,"Times New Roman",serif; font-style:italic; font-weight:700;
+    font-size:.92rem; color:#2c2825; margin-top:8px; text-align:center;
+  }
+  .yunomi-top-modes{ display:flex; justify-content:center; gap:6px; margin-top:10px; flex-wrap:wrap; }
+  .yunomi-top-mode-chip{
+    border:1.5px solid #b0b0b0; border-radius:20px; padding:3px 10px;
+    font-size:.7rem; font-weight:700; color:#7a7068; background:#fff;
+  }
+  .yunomi-top-mode-chip.yunomi-top-mode-active{
+    background:#5b6fa6; color:#fff; border-color:#5b6fa6;
+  }
+  #webtop-emap-grid{
+    position:relative; height:96px; border-radius:10px; overflow:hidden;
+    background:linear-gradient(135deg,#eaf1fb,#dbe7f7);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .webtop-emap-ph{ font-size:.68rem; color:#5c76a8; font-weight:700; position:relative; z-index:1; }
+  #webtop-curtain img.autoshot{ width:100%; height:78px; object-fit:cover; border-radius:10px; }
+  #webtop-curtain img.autoshot.ok + .webtop-curtain-ph{ display:none; }
+  #webtop-emap-grid img.autoshot{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+  #webtop-emap-grid.has-image .webtop-emap-ph{ display:none; }
+  .yunomi-top-emap-title{ font-weight:800; margin-top:6px; color:#2c2825; font-size:.82rem; }
+  .webtop-globe-row{ padding:6px 0 2px; }
+  .webtop-note{
+    margin-top:16px; font-size:.78rem; color:var(--muted); line-height:1.8; text-align:left;
+  }
+  .webtop-note b{ color:var(--plum); }
+  /* =========================================================
+     ★ HERO：TOP画面の下に並べる「ミニスマホ」2台（ゆのみ場／Eマップ）
+     画像はダミー（data:URIのSVG）です。正式画像に差し替えるときは
+     <img class="hero-mini-img ..."> の src を assets/images/xxx.png に
+     書き換えるだけでOK。アニメーションは画像の外側（CSS）で付けて
+     いるので、差し替え後もそのまま動きます。
+     ========================================================= */
+  .hero-visual{ display:flex; flex-direction:column; align-items:center; gap:26px; }
+  @media (max-width:860px){ .hero-visual{ order:-1; } }
+  .hero-minis{
+    display:flex; flex-wrap:wrap; justify-content:center; gap:18px; width:100%;
+  }
+  .hero-mini-phone{
+    position:relative; width:min(100%,262px);
+    background:#fff; border:7px solid #1f2a48; border-radius:26px;
+    padding:14px 14px 12px; text-align:center;
+    box-shadow:0 22px 44px -18px rgba(0,0,0,.55);
+    opacity:0; transform:translateY(24px) scale(.96);
+    animation:heroMiniIn .9s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  .hero-mini-phone:nth-child(2){ animation-delay:.25s; }
+  /* 横向きスマホっぽく：左端にカメラ、右端にボタン */
+  .hero-mini-phone::before{
+    content:""; position:absolute; left:-5px; top:50%; width:3px; height:3px;
+    margin-top:-1.5px; border-radius:50%; background:#5a6690;
+  }
+  .hero-mini-phone::after{
+    content:""; position:absolute; right:-11px; top:28%; width:3px; height:26px;
+    border-radius:2px; background:#1f2a48;
+  }
+  @keyframes heroMiniIn{ to{ opacity:1; transform:none; } }
+
+  /* --- ゆのみ場：のれんが風で揺れる（上端固定で下側がなびく） --- */
+  .hero-noren-wrap{ overflow:hidden; padding:2px 4px 6px; }
+  .hero-noren{
+    display:block; width:100%; height:auto;
+    transform-origin:50% 0;
+    animation:heroNorenSway 4.8s ease-in-out infinite;
+  }
+  @keyframes heroNorenSway{
+    0%,100%{ transform:skewX(0deg)    scaleY(1); }
+    20%    { transform:skewX(-4deg)   scaleY(.985); }
+    45%    { transform:skewX(2.5deg)  scaleY(1); }
+    65%    { transform:skewX(-1.5deg) scaleY(.992); }
+    82%    { transform:skewX(.8deg)   scaleY(1); }
+  }
+  .hero-mini-phone .yunomi-top-catchphrase{ min-height:1.4em; margin-top:4px; }
+  .hero-type-caret{
+    display:inline-block; width:1px; height:1em; margin-left:2px;
+    background:#2c2825; vertical-align:-2px;
+    animation:heroCaret .8s steps(1) infinite;
+  }
+  @keyframes heroCaret{ 50%{ opacity:0; } }
+  .hero-mini-phone .yunomi-top-mode-chip{ transition:background .3s, color .3s, border-color .3s, transform .3s; }
+  .hero-mini-phone .yunomi-top-mode-chip.yunomi-top-mode-active{ transform:scale(1.08); }
+
+  /* --- Eマップ：マス目がゆっくり寄り、▼が落ちてきて回転＋着地の波紋 --- */
+  .hero-emap-stage{ position:relative; height:132px; overflow:hidden; }
+  .hero-emap-img{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:contain;
+    animation:heroEmapZoom 9s ease-in-out infinite alternate;
+  }
+  @keyframes heroEmapZoom{ from{ transform:scale(1); } to{ transform:scale(1.07); } }
+  .hero-emap-pin{
+    position:absolute; left:0; right:0; top:0; bottom:0;
+    animation:heroPinDrop 1.1s cubic-bezier(.3,1.4,.5,1) .9s both;
+  }
+  @keyframes heroPinDrop{
+    0%  { transform:translateY(-120px); opacity:0; }
+    60% { opacity:1; }
+    100%{ transform:translateY(0); opacity:1; }
+  }
+  .hero-emap-pin .demo-emap-arrow-front{ border-top-color:#d9a83c; }
+  .hero-emap-pin .demo-emap-arrow-back { border-top-color:#1a3d7c; }
+  .hero-emap-ring{
+    position:absolute; left:50%; top:50%; width:34px; height:11px;
+    margin:1px 0 0 -17px; border-radius:50%;
+    border:2px solid rgba(217,168,60,.9);
+    opacity:0; animation:heroRing 2.2s ease-out 2s infinite;
+  }
+  @keyframes heroRing{
+    0%  { transform:scale(.3); opacity:.95; }
+    100%{ transform:scale(2.4); opacity:0; }
+  }
+  .hero-mini-phone .yunomi-top-emap-title{ font-size:.95rem; margin-top:4px; }
+
+  @media (prefers-reduced-motion:reduce){
+    .hero-mini-phone, .hero-noren, .hero-emap-img, .hero-emap-pin, .hero-emap-ring{
+      animation:none !important; opacity:1; transform:none;
+    }
+    .hero-emap-ring{ display:none; }
+  }
 </style>
 </head>
 <body>
@@ -23,13 +346,11 @@
   <div class="wrap">
     <a href="#top" class="brand"><span class="brand-mark"></span>PrivaDiary</a>
     <nav class="main-nav">
+      <a href="#toc">目次</a>
       <a href="#screen-guide">画面の見かた</a>
-      <a href="#life">LIFEモード</a>
-      <a href="#diary">日記帳</a>
-      <a href="#album">アルバム</a>
-      <a href="#schedule">スケジュール</a>
-      <a href="#travel">旅行</a>
-      <a href="#mail">メール・通話</a>
+      <a href="#life-overview">LIFEモード</a>
+      <a href="#web-overview">WEBモード</a>
+      <a href="#mail-overview">メールモード</a>
       <a href="#getstarted">はじめかた</a>
     </nav>
   </div>
@@ -38,11 +359,12 @@
 <section class="hero" id="top">
   <div class="wrap">
     <div>
-      <div class="eyebrow">メモ &amp; メッセージアプリ</div>
+      <div class="eyebrow">メモ &amp; メッセージ &amp; マイページ</div>
       <h1>毎日のメモが、<br>知らず知らずのうちに記録になる。</h1>
       <p class="lead">
         PrivaDiaryは、日々のメモや思いつきが知らず知らずに記録として残り、生活を便利にしていくことを目的としています。
         書く、残す、伝える、創造する、共有する、自分のページを作り世界を広げる、そんな自分で育てる生活メモ用アプリです。
+        このページは、そんなPrivaDiaryのご案内と使い方をまとめた取扱説明ページです。目次から気になる項目へすぐに移動できます。
       </p>
       <div class="hero-badges">
         <span class="badge">日々のメモ、備忘録、予定が日記に。簡単操作</span>
@@ -52,10 +374,106 @@
         <span class="badge">趣味の世界をオリジナルページを創り共有</span>
         <span class="badge">先祖から子孫へ繋ぐ</span>
         <span class="badge">オンライン通話・TV通話つきメール</span>
+        <span class="badge">Eアドレスで自分のページを持ち、世界とつながる</span>
       </div>
     </div>
-    <div class="phone">
-      <img src="assets/images/hero-life.png" alt="PrivaDiary LIFEモードの画面例">
+    <div class="hero-visual">
+      <div class="phone">
+        <img src="assets/images/hero-life.png" alt="PrivaDiary LIFEモードの画面例">
+      </div>
+
+      <!-- ★ミニスマホ2台（ゆのみ場／Eマップ）。画像はダミーです -->
+      <div class="hero-minis">
+        <!-- ゆのみ場 -->
+        <div class="hero-mini-phone">
+          <div class="hero-noren-wrap">
+            <!-- ★差し替え：src を "assets/images/hero-yunomi.png" などに書き換え -->
+            <img class="hero-noren" alt="ゆのみ場"
+                 src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 130'><rect x='8' y='8' width='284' height='5' fill='%232e9e5a'/><rect x='8' y='13' width='284' height='5' fill='%232b6fd6'/><rect x='8' y='18' width='284' height='3' fill='%232e9e5a'/><rect x='20' y='2' width='14' height='22' fill='%233b4fd0'/><rect x='100' y='2' width='14' height='22' fill='%233b4fd0'/><rect x='180' y='2' width='14' height='22' fill='%233b4fd0'/><rect x='260' y='2' width='14' height='22' fill='%233b4fd0'/><path d='M12 24 H78 V112 L62 116 L45 110 L28 117 L12 112 Z' fill='%23bfe9f7' stroke='%237aa0c8' stroke-width='3'/><text x='45' y='90' font-size='54' text-anchor='middle' fill='%2327a64a' stroke='%23ffffff' stroke-width='3' paint-order='stroke' font-family='sans-serif' font-weight='700'>ゆ</text><path d='M82 24 H148 V112 L132 116 L115 110 L98 117 L82 112 Z' fill='%23bfe9f7' stroke='%237aa0c8' stroke-width='3'/><text x='115' y='90' font-size='54' text-anchor='middle' fill='%2327a64a' stroke='%23ffffff' stroke-width='3' paint-order='stroke' font-family='sans-serif' font-weight='700'>の</text><path d='M152 24 H218 V112 L202 116 L185 110 L168 117 L152 112 Z' fill='%23bfe9f7' stroke='%237aa0c8' stroke-width='3'/><text x='185' y='90' font-size='54' text-anchor='middle' fill='%2327a64a' stroke='%23ffffff' stroke-width='3' paint-order='stroke' font-family='sans-serif' font-weight='700'>み</text><path d='M222 24 H288 V112 L272 116 L255 110 L238 117 L222 112 Z' fill='%23bfe9f7' stroke='%237aa0c8' stroke-width='3'/><text x='255' y='90' font-size='54' text-anchor='middle' fill='%2327a64a' stroke='%23ffffff' stroke-width='3' paint-order='stroke' font-family='sans-serif' font-weight='700'>場</text><text x='292' y='127' font-size='9' text-anchor='end' fill='%239aa' font-family='sans-serif'>DUMMY</text></svg>">
+          </div>
+          <div class="yunomi-top-catchphrase"><span class="hero-typewriter" data-text="you know me ?">you know me ?</span><span class="hero-type-caret"></span></div>
+          <div class="yunomi-top-modes">
+            <span class="yunomi-top-mode-chip">文字</span>
+            <span class="yunomi-top-mode-chip">手書き</span>
+            <span class="yunomi-top-mode-chip">写真</span>
+            <span class="yunomi-top-mode-chip">フォロー</span>
+          </div>
+        </div>
+
+        <!-- Eマップ -->
+        <div class="hero-mini-phone">
+          <div class="hero-emap-stage">
+            <!-- ★差し替え：src を "assets/images/hero-emap.png" などに書き換え
+                 （▼マークはCSSで重ねて動かしているので、画像側には▼を入れないでください） -->
+            <img class="hero-emap-img" alt="Eマップ"
+                 src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 140'><g stroke='%23444' stroke-width='0.7'><line x1='82.0' y1='10.0' x2='34.0' y2='126.0'/><line x1='92.3' y1='10.0' x2='48.4' y2='126.0'/><line x1='102.6' y1='10.0' x2='62.9' y2='126.0'/><line x1='112.9' y1='10.0' x2='77.3' y2='126.0'/><line x1='123.1' y1='10.0' x2='91.7' y2='126.0'/><line x1='133.4' y1='10.0' x2='106.1' y2='126.0'/><line x1='143.7' y1='10.0' x2='120.6' y2='126.0'/><line x1='154.0' y1='10.0' x2='135.0' y2='126.0'/><line x1='164.3' y1='10.0' x2='149.4' y2='126.0'/><line x1='174.6' y1='10.0' x2='163.9' y2='126.0'/><line x1='184.9' y1='10.0' x2='178.3' y2='126.0'/><line x1='195.1' y1='10.0' x2='192.7' y2='126.0'/><line x1='205.4' y1='10.0' x2='207.1' y2='126.0'/><line x1='215.7' y1='10.0' x2='221.6' y2='126.0'/><line x1='226.0' y1='10.0' x2='236.0' y2='126.0'/><line x1='82.0' y1='10.0' x2='226.0' y2='10.0'/><line x1='77.2' y1='21.6' x2='227.0' y2='21.6'/><line x1='72.4' y1='33.2' x2='228.0' y2='33.2'/><line x1='67.6' y1='44.8' x2='229.0' y2='44.8'/><line x1='62.8' y1='56.4' x2='230.0' y2='56.4'/><line x1='58.0' y1='68.0' x2='231.0' y2='68.0'/><line x1='53.2' y1='79.6' x2='232.0' y2='79.6'/><line x1='48.4' y1='91.2' x2='233.0' y2='91.2'/><line x1='43.6' y1='102.8' x2='234.0' y2='102.8'/><line x1='38.8' y1='114.4' x2='235.0' y2='114.4'/><line x1='34.0' y1='126.0' x2='236.0' y2='126.0'/></g><g font-size='6' fill='%23555' font-family='sans-serif' text-anchor='end'><text x='76.6' y='17.8'>005R</text><text x='71.8' y='29.4'>006R</text><text x='67.0' y='41.0'>007R</text><text x='62.2' y='52.6'>008R</text><text x='57.4' y='64.2'>009R</text><text x='52.6' y='75.8'>010R</text><text x='47.8' y='87.4'>011R</text><text x='43.0' y='99.0'>012R</text><text x='38.2' y='110.6'>013R</text><text x='33.4' y='122.2'>014R</text></g><text x='256' y='137' font-size='8' text-anchor='end' fill='%239aa' font-family='sans-serif'>DUMMY</text></svg>">
+            <div class="hero-emap-pin">
+              <span class="hero-emap-ring"></span>
+              <div class="demo-emap-arrow-wrap"><div class="demo-emap-arrow">
+                <div class="demo-emap-arrow-front"></div>
+                <div class="demo-emap-arrow-back"></div>
+              </div></div>
+            </div>
+          </div>
+          <div class="yunomi-top-emap-title">Eマップ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 目次（TOC） ============ -->
+<section id="toc">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker"><span class="num">目次</span>ご案内</div>
+      <h2>このページの目次</h2>
+      <p>
+        項目をクリックすると、該当箇所へジャンプします。画面右下の「☰ 目次」ボタンから、いつでもこのページへ戻れます。
+      </p>
+    </div>
+    <div class="toc-card">
+      <div class="toc-groups">
+        <div class="toc-group">
+          <h4>o. ご案内</h4>
+          <ul>
+            <li><a href="#screen-guide">画面の見かた</a></li>
+          </ul>
+        </div>
+        <div class="toc-group">
+          <h4>i. LIFEモード</h4>
+          <ul>
+            <li><a href="#life-overview">LIFEモードの全体像</a></li>
+            <li><a href="#diary">メモ記（日記帳）</a></li>
+            <li><a href="#album">アルバム</a></li>
+            <li><a href="#sharedalbum">繋がるアルバム／みんなのアルバム</a></li>
+            <li><a href="#more">連絡先・お気に入り・お知らせ 他</a></li>
+            <li><a href="#recipe">レシピ</a></li>
+            <li><a href="#schedule">スケジュール</a></li>
+            <li><a href="#travel">旅行</a></li>
+          </ul>
+        </div>
+        <div class="toc-group">
+          <h4>ii. WEBモード</h4>
+          <ul>
+            <li><a href="#web-overview">WEBモードの全体像</a></li>
+            <li><a href="#yunomiba">ゆのみ場</a></li>
+            <li><a href="#eaddress">Eマップ・Eアドレスの取得方法</a></li>
+            <li><a href="#follow">フォロー</a></li>
+            <li><a href="#myweb">MyWeb（自分のページ）</a></li>
+            <li><a href="#webpd">WebPD（みんなのページ）</a></li>
+            <li><a href="#access-history">アクセス履歴</a></li>
+          </ul>
+        </div>
+        <div class="toc-group">
+          <h4>iii. メールモード／はじめかた</h4>
+          <ul>
+            <li><a href="#mail-overview">メールモードの全体像</a></li>
+            <li><a href="#mail">メッセージ・通話・TV通話</a></li>
+            <li><a href="#getstarted">はじめかた（3ステップ）</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -66,8 +484,9 @@
       <div class="kicker"><span class="num">o.</span>ご案内</div>
       <h2>画面の見かた</h2>
       <p>
-        初期画面の説明をします。LIFEモードとメールモードがあります。
+        画面下部には「WEB」「LIFE」「メール」の3つのボタンがあります。
         LIFEモードでは、メモ、アルバムなど１０ページ以上の機能別ページ、さらに自分で追加して増えるページ機能等があります。
+        WEBモードでは、気軽な投稿広場「ゆのみ場」や、自分だけの住所「Eアドレス」を中心に、自分のページ作り・他の人のページ巡りが楽しめます。
         メールモードは友達登録をすると、友達タブが出来、メール、オンライン電話、TV電話、録音、録画機能があります。
         下の画面例はパソコン版のものでLIFEモードを選択している時を示します。スマホでご利用の場合は、機種画面サイズになります。
       </p>
@@ -86,16 +505,17 @@
       <ul class="screen-guide-list" style="margin-top:0;columns:1;column-gap:40px;">
         <li>ユーザー名：新規登録が完了すると表示されます</li>
         <li>設定：新規登録・ログイン・ログアウト・友達招待ここから行います</li>
+        <li>画面下部の切替ボタン：「WEB」「🌿 LIFE」「メール」の3つで、それぞれのモードに切り替わります</li>
         <li>LIFEモード選択タブ：日記帳・アルバム・連絡先などをここで切り替えます</li>
         <li>メモ記の着せ替え：日めくりモードのみ背景を変えられ、My日記帳風にアレンジできます</li>
-        <li>友達タブ：友達タブを選択すると、LIFEモードから抜け、メール送受信、オンライン電話等が利用できます。</li>
+        <li>友達タブ：友達タブを選択すると、LIFEモードから抜け、メール送受信、オンライン電話等が利用できます。友達名をタップするとグループのメンバーも確認できます</li>
         <li>オフラインメモ記への切り替え：飛行機内など電波の無い場所でもメモできます</li>
       </ul>
     </div>
   </div>
 </section>
 
-<section id="life">
+<section id="life-overview">
   <div class="wrap">
     <div class="section-head">
       <div class="kicker"><span class="num">i.</span>ご案内</div>
@@ -158,8 +578,8 @@
   </div>
 </section>
 
-<!-- アルバム -->
-<section id="album">
+<!-- 繋がる／みんなのアルバム -->
+<section id="sharedalbum">
   <div class="wrap">
     <div class="tab-card" data-tab="繋がるアルバム">
       <div class="feature reverse">
@@ -175,21 +595,18 @@
             <li>写真、メッセージで創る歴史、目で見る歴史を作りましょう</li>
             <li>部屋は自由に作り、参加者も友達リストから選べます</li>
           </ul>
- 　　　　　<h3>みんなのアルバム</h3>
+          <h3>みんなのアルバム</h3>
           <ul>
             <li>グループ旅行など、テーマにそった写真を集め、コメントを書き、楽しむページです</li>
             <li>ペット専用ページなどで、成長の様子など、かわいい写真をみんなで共有することもできます</li>
             <li>趣味のチームの連絡、記念写真、競技結果などをみんなで共有し勝負しましょう</li>
             <li>部屋は自由に作り、参加者も友達リストから選べます</li>
-          <ul>
+          </ul>
         </div>
       </div>
     </div>
   </div>
 </section>
-
-
-
 
 <!-- 連絡先・お気に入り・お知らせ・＋ページ -->
 <section class="section-tint" id="more">
@@ -229,6 +646,18 @@
         <h4>お知らせ</h4>
         <p>運営からのお知らせを、通常・重要・緊急の3段階で受け取れます。緊急時はポップアップでもお知らせします。</p>
         <img src="assets/images/notices.png" alt="お知らせ画面">
+      </div>
+      <div class="mini-card">
+        <div class="icon">📰</div>
+        <h4>NHKニュース</h4>
+        <p>LIFEモードから離れずに、NHKの最新ニュースの見出しをそのままチェックできます。</p>
+        <img class="autoshot" src="assets/images/news.png" alt="NHKニュースタブの画面キャプチャ"
+             onload="this.classList.add('ok')">
+        <div class="shot-placeholder">
+          <div class="ph-icon">🖼️</div>
+          <div class="ph-text">NHKニュースタブの画面キャプチャ<br>
+            <span class="ph-file">assets/images/news.png</span></div>
+        </div>
       </div>
       <div class="mini-card">
         <div class="icon">＋</div>
@@ -305,10 +734,283 @@
   </div>
 </section>
 
-<section id="life">
+<!-- ============ WEBモード ============ -->
+<section class="section-tint" id="web-overview">
   <div class="wrap">
     <div class="section-head">
-      <div class="kicker"><span class="num">i.</span>ご案内</div>
+      <div class="kicker"><span class="num">ii.</span>ご案内</div>
+      <h2>WEBモードでできること</h2>
+      <p>
+        画面下の「WEB」ボタンをタップすると、LIFEモード・メールモードとは別の、もうひとつの世界が広がります。
+        気軽な投稿広場「ゆのみ場」を入口に、自分だけの住所「Eアドレス」を取得すると、Eマップ上に自分の場所ができます。
+        そこに自分のページ（MyWeb）を育てたり、フォローし合った人やWebPDで見つけた人のページを訪ねたりできます。
+      </p>
+    </div>
+
+    <div class="webtop-row">
+      <div class="webtop-note">
+        右はWEBタブを開くと最初に表示されるTOP画面です。<b>Eマップの▼マークと、MyWeb・WebPDの地球儀は、実際のアプリと同じCSSで、このページの中で本物どおりに動いています。</b><br><br>
+        「ゆのみ場」ののれんと、Eマップのマス目の背景画像は、まだダミー（プレースホルダー）です。<code>assets/images/web-curtain.png</code>と<code>assets/images/web-emap-3d.png</code>を置いていただくだけで、HTMLの編集なしに自動で実画像に差し替わります（クリック領域・アニメーションのロジックはそのまま使えます）。
+      </div>
+      <div class="webtop-frame">
+        <div class="webtop-screen">
+          <!-- ゆのみ場 -->
+          <div class="yunomi-top-lead">気持ちで色が変わる！<strong>なんでも投稿広場</strong></div>
+          <div class="yunomi-top-card">
+            <div id="webtop-curtain">
+              <img class="autoshot" src="assets/images/web-curtain.png" alt="ゆのみ場"
+                   onload="this.classList.add('ok')">
+              <div class="webtop-curtain-ph">ゆ　の　み　場（ダミー画像）</div>
+            </div>
+            <div class="yunomi-top-catchphrase">you know me ?</div>
+            <div class="yunomi-top-modes">
+              <span class="yunomi-top-mode-chip" id="yunomi-top-mode-text">文字</span>
+              <span class="yunomi-top-mode-chip" id="yunomi-top-mode-draw">手書き</span>
+              <span class="yunomi-top-mode-chip" id="yunomi-top-mode-photo">写真</span>
+              <span class="yunomi-top-mode-chip" id="yunomi-top-mode-follow">フォロー</span>
+            </div>
+          </div>
+
+          <!-- Eマップ -->
+          <div class="yunomi-top-lead">自分専用Eアドレスをゲット！</div>
+          <div class="yunomi-top-card">
+            <div id="webtop-emap-grid">
+              <img class="autoshot" src="assets/images/web-emap-3d.png" alt="Eマップ（3Dモード）"
+                   onload="this.classList.add('ok'); this.parentElement.classList.add('has-image');">
+              <span class="webtop-emap-ph">Eマップ（ダミー画像）</span>
+              <div class="demo-emap-arrow-wrap"><div class="demo-emap-arrow">
+                <div class="demo-emap-arrow-front"></div>
+                <div class="demo-emap-arrow-back"></div>
+              </div></div>
+            </div>
+            <div class="yunomi-top-emap-title">Eマップ</div>
+          </div>
+
+          <!-- MyWeb -->
+          <div class="yunomi-top-lead">自分のサイトを確認・整理</div>
+          <div class="yunomi-top-card webtop-globe-row">
+            <div class="demo-globe-wrap" style="width:2.4rem;height:2.4rem;">
+              <div class="demo-globe-orbit" style="inset:-20px;"><div class="demo-globe-orbit-spin">
+                <span class="demo-globe-satellite" style="width:16px;height:16px;margin-left:-8px;"></span>
+              </div></div>
+              <span class="demo-globe-emoji" style="font-size:2.4rem;">🌐</span>
+            </div>
+            <div class="yunomi-top-emap-title">MyWeb（作成済みサイト）</div>
+          </div>
+
+          <!-- WebPD -->
+          <div class="yunomi-top-card webtop-globe-row">
+            <div class="demo-globe-wrap demo-globe-reverse" style="width:2.4rem;height:2.4rem;">
+              <div class="demo-globe-orbit" style="inset:-20px;"><div class="demo-globe-orbit-spin">
+                <span class="demo-globe-satellite" style="width:16px;height:16px;margin-left:-8px;"></span>
+              </div></div>
+              <span class="demo-globe-emoji" style="font-size:2.4rem;">🌍</span>
+            </div>
+            <div class="yunomi-top-emap-title">WebPD（一般サイト）</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ゆのみ場 -->
+<section id="yunomiba">
+  <div class="wrap">
+    <div class="tab-card" data-tab="ゆのみ場">
+      <div class="feature">
+        <div class="feature-copy">
+          <h3>気持ちで色が変わる、なんでも投稿広場。</h3>
+          <ul>
+            <li>「文字」「手書き」「写真」、好きなモードで気軽に投稿できます</li>
+            <li>「並び順（自分／全体／インプレ数順）」「期間」「種類」で、見たい投稿を絞り込めます</li>
+            <li>気になる投稿主はワンタップでフォローでき、フォロー中の投稿だけを追うこともできます</li>
+          </ul>
+        </div>
+        <div class="feature-media">
+          <img class="autoshot" src="assets/images/web-yunomiba.png" alt="ゆのみ場のタイムライン画面"
+               onload="this.classList.add('ok')">
+          <div class="shot-placeholder">
+            <div class="ph-icon">🖼️</div>
+            <div class="ph-text">ゆのみ場のタイムライン画面キャプチャ<br>
+              <span class="ph-file">assets/images/web-yunomiba.png</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Eマップ・Eアドレス -->
+<section class="section-tint" id="eaddress">
+  <div class="wrap">
+    <div class="tab-card" data-tab="Eマップ">
+      <div class="feature reverse">
+        <div class="feature-media">
+          <div class="live-demo">
+            <div class="live-demo-stage">
+              <div class="demo-emap-grid">
+                <div class="demo-emap-arrow-wrap"><div class="demo-emap-arrow">
+                  <div class="demo-emap-arrow-front"></div>
+                  <div class="demo-emap-arrow-back"></div>
+                </div></div>
+              </div>
+            </div>
+            <div class="live-demo-caption">
+              実際にEマップ上でくるくる回っている目印です。<b>このページの中で、本物と同じCSSアニメーションが動いています。</b><br>
+              青と金色に見え方が変わるのも、回転に応じてブラウザが自動で計算している本物の3D表現です。
+            </div>
+          </div>
+        </div>
+        <div class="feature-copy">
+          <h3>Eマップと、自分だけの住所「Eアドレス」。</h3>
+          <p>
+            Eマップは、Eアドレスを取得した人だけが載る、立体的な格子状の地図です。自分の場所を持つと、そこが自分のホームになり、
+            MyWebページを育てたり、他の人に見つけてもらったりできるようになります。
+          </p>
+          <p style="margin-top:12px;font-weight:700;color:var(--plum-deep);">Eアドレスの取得方法</p>
+          <ul>
+            <li>WEBタブ内から「🏷️ Eアドレスを取得」を押す</li>
+            <li>案内に沿って進めると、自分だけのEアドレスが発行されます</li>
+            <li>取得後は「🗺️ Eマップを見る」から、いつでも自分の場所を確認できます</li>
+            <li>他の人のマスをタップすると、その人のページを見に行けます</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- フォロー -->
+<section id="follow">
+  <div class="wrap">
+    <div class="tab-card" data-tab="フォロー">
+      <div class="feature">
+        <div class="feature-copy">
+          <h3>気になった人と、ゆるくつながる。</h3>
+          <ul>
+            <li>ゆのみ場やEマップで気になった人を、ワンタップでフォローできます</li>
+            <li>フォロー中の人は一覧にまとまり、投稿や活動をまとめて見返せます</li>
+            <li>フォローの解除もいつでも自由に行えます</li>
+          </ul>
+        </div>
+        <div class="feature-media">
+          <img class="autoshot" src="assets/images/web-follow.png" alt="フォロー一覧の画面"
+               onload="this.classList.add('ok')">
+          <div class="shot-placeholder">
+            <div class="ph-icon">🖼️</div>
+            <div class="ph-text">フォロー一覧の画面キャプチャ<br>
+              <span class="ph-file">assets/images/web-follow.png</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MyWeb -->
+<section class="section-tint" id="myweb">
+  <div class="wrap">
+    <div class="tab-card" data-tab="MyWeb">
+      <div class="feature reverse">
+        <div class="feature-media">
+          <div class="live-demo">
+            <div class="live-demo-stage">
+              <div>
+                <div class="demo-globe-wrap">
+                  <div class="demo-globe-orbit"><div class="demo-globe-orbit-spin">
+                    <span class="demo-globe-satellite"></span>
+                  </div></div>
+                  <span class="demo-globe-emoji">🌐</span>
+                </div>
+                <div class="demo-globe-label">MyWeb</div>
+              </div>
+            </div>
+            <div class="live-demo-caption">
+              地球儀のまわりを回る衛星も、本物のアプリと同じアニメーションです。半周は手前を、半周は奥を通り、ちゃんと地球儀のまわりを回って見えます。
+            </div>
+          </div>
+        </div>
+        <div class="feature-copy">
+          <h3>MyWeb：自分だけの公開ページ。</h3>
+          <ul>
+            <li>Eアドレスを取得すると持てる、自分だけの公開ページです</li>
+            <li>内容の編集や、公開状態の整理をいつでも行えます</li>
+            <li>仕上がりは、後述のWebPDで他の人からも見つけてもらえます</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WebPD -->
+<section id="webpd">
+  <div class="wrap">
+    <div class="tab-card" data-tab="WebPD">
+      <div class="feature">
+        <div class="feature-copy">
+          <h3>WebPD：みんなのページを見にいく。</h3>
+          <ul>
+            <li>自分以外の人が公開しているページを、新着順の一覧で見られます</li>
+            <li>ヘッダー・本文・Eアドレスの3項目から検索できます</li>
+            <li>気になるEアドレスをタップすると、Eマップ上のその場所へジャンプできます</li>
+          </ul>
+        </div>
+        <div class="feature-media">
+          <div class="live-demo">
+            <div class="live-demo-stage">
+              <div>
+                <div class="demo-globe-wrap demo-globe-reverse">
+                  <div class="demo-globe-orbit"><div class="demo-globe-orbit-spin">
+                    <span class="demo-globe-satellite"></span>
+                  </div></div>
+                  <span class="demo-globe-emoji">🌍</span>
+                </div>
+                <div class="demo-globe-label">WebPD</div>
+              </div>
+            </div>
+            <div class="live-demo-caption">
+              WebPDの地球儀はMyWebと逆回転。衛星が手前に出るタイミングも逆になるよう調整してあります。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- アクセス履歴 -->
+<section class="section-tint" id="access-history">
+  <div class="wrap">
+    <div class="tab-card" data-tab="アクセス履歴">
+      <div class="feature reverse">
+        <div class="feature-media">
+          <img class="autoshot" src="assets/images/access-history.png" alt="アクセス履歴タブの画面"
+               onload="this.classList.add('ok')">
+          <div class="shot-placeholder">
+            <div class="ph-icon">🖼️</div>
+            <div class="ph-text">アクセス履歴タブの画面キャプチャ<br>
+              <span class="ph-file">assets/images/access-history.png</span></div>
+          </div>
+        </div>
+        <div class="feature-copy">
+          <h3>自分のEアドレスに、何人来てくれたか。</h3>
+          <ul>
+            <li>自分のEアドレスへの訪問回数を、日別に確認できます</li>
+            <li>記録するのは日ごとの合計回数のみ。誰が訪れたかは記録されず、プライバシーに配慮した作りです</li>
+            <li>LIFEモードの「📈アクセス履歴」タブからご覧いただけます</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="mail-overview">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker"><span class="num">iii.</span>ご案内</div>
       <h2>メールモードでできること</h2>
       <p>
         友達登録が出来たら、画面下の「LIFE」タブ横に、友達用タブが現れます。それをタップし、メッセージ送信、オンライン電話、オンラインTV電話、録音・録画ができます。
@@ -335,6 +1037,7 @@
             <li>音声通話・TV通話（ビデオ通話）に対応し、通話中もメッセージを送れます</li>
             <li>通話・TV通話は録音・録画も可能（データはご自身のスマホ内に保存されます）</li>
             <li>日記帳と同じ文具（手書き・写真）をメールでも使えます</li>
+            <li>友達名をタップすると、そのグループのメンバー一覧を開閉できます</li>
           </ul>
           <p style="margin-top:16px;color:var(--muted);font-size:.88rem;">
             ＊オンライン通話は、相手がオンライン中のときのみ呼び出せます。
@@ -348,7 +1051,7 @@
 <section id="getstarted">
   <div class="wrap">
     <div class="section-head">
-      <div class="kicker"><span class="num">iii.</span>ご案内</div>
+      <div class="kicker"><span class="num">iv.</span>ご案内</div>
       <h2>はじめかた</h2>
       <p>
         インストールから、ご家族・ご友人を招待するところまで、3つのステップでご案内します。
@@ -400,7 +1103,7 @@
           <p style="margin-top:16px;"><b>招待された側</b></p>
           <ul>
             <li>すでに登録済みの方：受け取った友達コードを、友達タブの入力欄に入れるだけで完了です</li>
-            <li>招待者の近くにいる場合は、６桁の友達コードを教えてもらい、友達タブの入力欄に入れるだけで完了です</li>　
+            <li>招待者の近くにいる場合は、６桁の友達コードを教えてもらい、友達タブの入力欄に入れるだけで完了です</li>
             <li>未登録の方：まず①②と同じ方法でインストール・新規登録をしてから、同じく友達コードを入力してください</li>
 
           </ul>
@@ -417,13 +1120,74 @@
   <div class="wrap">
     <div>
       <a href="#top" class="brand"><span class="brand-mark"></span>PrivaDiary</a>
-      <p class="foot-note">このページは、PrivaDiaryの使い方をご紹介するための案内ページです。</p>
+      <p class="foot-note">このページは、PrivaDiaryの使い方をご紹介・ご説明するための案内ページです。</p>
     </div>
   </div>
   <div class="wrap foot-bottom">
     © PrivaDiary — ご紹介ページ
   </div>
 </footer>
+
+<a href="#toc" id="toc-fab">目次</a>
+<script>
+  // 目次に戻るボタン：ページ先頭（hero）を過ぎたら表示する
+  (function(){
+    var fab = document.getElementById('toc-fab');
+    var hero = document.getElementById('top');
+    if(!fab || !hero) return;
+    function onScroll(){
+      var heroBottom = hero.getBoundingClientRect().bottom;
+      if(heroBottom < 0){ fab.classList.add('show'); }
+      else { fab.classList.remove('show'); }
+    }
+    window.addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+  })();
+
+  // ゆのみ場のモード表示（文字/手書き/写真/フォロー）を自動で巡回ハイライト
+  // ※本体アプリの _yunomiTopStartCycle() と同じロジック・同じ間隔（1.8秒）です
+  //   ページ内のすべての .yunomi-top-modes（HEROのミニスマホ／WEBモード欄）に適用
+  (function(){
+    var groups = document.querySelectorAll('.yunomi-top-modes');
+    Array.prototype.forEach.call(groups, function(group){
+      var chips = group.querySelectorAll('.yunomi-top-mode-chip');
+      if (!chips.length) return;
+      var idx = 0;
+      function applyHighlight(){
+        Array.prototype.forEach.call(chips, function(el, i){
+          el.classList.toggle('yunomi-top-mode-active', i === idx);
+        });
+      }
+      applyHighlight();
+      setInterval(function(){
+        idx = (idx + 1) % chips.length;
+        applyHighlight();
+      }, 1800);
+    });
+  })();
+
+  // HEROミニスマホ：「you know me ?」をタイプライター風に打つ→消す→くり返し
+  (function(){
+    var el = document.querySelector('.hero-typewriter');
+    if (!el) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var text = el.getAttribute('data-text') || el.textContent;
+    var i = 0, typing = true;
+    el.textContent = '';
+    function tick(){
+      if (typing){
+        i++; el.textContent = text.slice(0, i);
+        if (i >= text.length){ typing = false; return setTimeout(tick, 2600); }
+        setTimeout(tick, 110);
+      } else {
+        i--; el.textContent = text.slice(0, i);
+        if (i <= 0){ typing = true; return setTimeout(tick, 500); }
+        setTimeout(tick, 45);
+      }
+    }
+    setTimeout(tick, 1200);
+  })();
+</script>
 
 </body>
 </html>
