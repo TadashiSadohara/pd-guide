@@ -243,6 +243,16 @@
 
   .demo-emap-grid img.autoshot{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#fff; z-index:0; }
   .demo-emap-grid .demo-emap-arrow-wrap{ z-index:1; }
+  /* Eマップ：スマホで横にはみ出さないようにする */
+  #eaddress .feature-media{ min-width:0; }
+  #eaddress .live-demo-stage{ width:100%; max-width:380px; box-sizing:border-box; }
+  #eaddress .demo-emap-grid{ width:100%; max-width:none; }
+  @media (max-width:600px){
+    #eaddress .live-demo{ padding:16px 12px; }
+    #eaddress .live-demo-stage{ padding:12px; }
+  }
+
+
   #webtop-emap-grid.has-image .webtop-emap-ph{ display:none; }
   .yunomi-top-emap-title{ font-weight:800; margin-top:6px; color:#2c2825; font-size:.82rem; }
   .webtop-globe-row{ padding:6px 0 2px; }
@@ -968,7 +978,7 @@
                 </div></div>
               </div>
             </div>
-            <div class="live-demo-caption">
+
            
             </div>
           </div>
