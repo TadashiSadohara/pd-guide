@@ -16,6 +16,21 @@
     }
   }
 
+  /* ★ 2026-09-30: スマホ表示で各機能の説明枠（.tab-card）を画面いっぱいに広げる。
+     style.css側では .wrap の左右余白28px ＋ .tab-card の左右余白22px が重なり、
+     文字の左右に計50px以上の空白ができていたため、このページ側で上書きする
+     （assets/style.css は変更しない。PC表示には影響なし）。 */
+  @media (max-width: 600px) {
+    .tab-card{
+      margin-left:-20px; margin-right:-20px;   /* .wrapの余白28px → 画面端から8px */
+      padding:34px 14px 22px;                  /* 枠の内側の余白 22px → 14px */
+      border-radius:14px;
+    }
+    .tab-card::before{ left:16px; }            /* 上の見出しラベルも枠に合わせて左へ */
+    .tab-card .feature-media{ padding:10px; }  /* 画面写真まわりの余白 22px → 10px */
+    .tab-card .feature{ gap:28px; }
+  }
+
   /* =========================================================
      ★ このページ専用の追加スタイル（assets/style.cssは変更していません）
      ① 目次（TOC）まわり　② 画像未準備の代わりに出す「プレースホルダー」
@@ -760,8 +775,8 @@
         <div class="icon">📍</div>
         <h4>マイロコメモ</h4>
         <p>”自動記録”をONにしておくと、アプリを開いた場所を自動で記録し、行動記録や不正アクセスの確認にも使えます。
-          毎日の日記やメモは忘れがち。例えばヘアカットにいつ行ったかを忘れた時でも、どこに行ったか記録があれば思い出せます。使っておらばいつか役立つ機能です。</p>
-        <img src="assets/images/myloco1.png" alt="マイロコページのサンプル画面">
+          毎日の日記やメモは忘れがち。例えば”ヘアカットにいつ行ったか”などを忘れた時でも、どこに行ったか記録があれば思い出せます。使っておればいつか役立つ機能です。</p>
+        <img src="assets/images/myloco1.png" alt="イロコページのサンプル画面">
       </div>
       <div class="mini-card">
         <div class="icon">！</div>
