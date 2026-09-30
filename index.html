@@ -29,6 +29,17 @@
     .tab-card::before{ left:16px; }            /* 上の見出しラベルも枠に合わせて左へ */
     .tab-card .feature-media{ padding:10px; }  /* 画面写真まわりの余白 22px → 10px */
     .tab-card .feature{ gap:28px; }
+
+    /* 同じ「白い枠」形式の他の箇所も同様に広げる */
+    .toc-card{                                  /* 目次 */
+      margin-left:-20px; margin-right:-20px;
+      padding:24px 16px 4px; border-radius:14px;
+    }
+    #more .grid-3{ margin-left:-20px; margin-right:-20px; gap:16px; }  /* 「その他の機能」の小さい枠 */
+    .mini-card{ padding:20px 16px; border-radius:14px; }
+    .tab-card .live-demo{ padding:14px 10px; }            /* 動くデモの枠（枠の中の枠） */
+    .tab-card .live-demo .live-demo-stage{ padding:14px 12px; gap:20px; max-width:100%; box-sizing:border-box; }
+    .shot-placeholder{ padding:24px 12px; box-sizing:border-box; }
   }
 
   /* =========================================================
